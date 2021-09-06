@@ -2,20 +2,11 @@
 
 const express = require('express');
 const morgan = require('morgan');
+const routes = require('./routes');
+const cors = require ('cors');
+const {sequelize} = require('./models');
 
-//Confirm we can connect with the database
-const db = require('./models');
-(async () => {
-    try {
-        console.log(`Attempting to connect to the database...`);
-        await db.sequelize.sync();
-        await db.sequelize
-            .authenticate()
-            .then(() => console.log('Database connection established'));
-    } catch (err) {
-        console.log(`There was an error connecting to the database: ${err.message}`);
-    }
-})();
+
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -27,11 +18,23 @@ app.use(express.json());
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
+//Enable CORS
+app.use(cors());
+
+
+//Confirm we can connect with the database
+(async () => {
+    try {
+        console.log(`Attempting to connect to the database...`);
+        await sequelize.authenticate();
+        console.log('Database connection established');
+    } catch (err) {
+        console.log(`There was an error connecting to the database: ${err.message}`);
+    }
+})();
+
 // Setup my API routes
-const userRoute = require('./routes/users');
-const courseRoute = require('./routes/courses');
-app.use('/api/users', userRoute);
-app.use('/api/courses', courseRoute);
+app.use('/api', routes);
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {

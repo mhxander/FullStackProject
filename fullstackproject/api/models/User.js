@@ -20,26 +20,22 @@ module.exports = (sequelize) => {
         },
         emailAddress: {
             type: Sequelize.STRING,
-            allowNull: false,
-            unique: {
-                args: true,
-                msg: 'Please provide a unique email address'
-            },
             validate: {
-                isEmail: {
-                    args: true,
-                    msg: 'Email address must be in standard format: mail@mail.com'
+                notEmpty: {
+                    msg: "Please provide your Email Address"
+                },
+                is: {
+                    args: /^[^@]+@[^@.]+\.[a-z]+$/i,
+                    msg: "Please provide a VALID 'emailAddress'"
                 }
             }
         },
         password: {
             type: Sequelize.STRING,
-            allowNull: false,
             validate: {
-                is: {
-                    args: /^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$/i,
-                    msg: 'Password failed to hash. Please contact the site administrator.',
-                },
+                notEmpty: {
+                    msg: "Please provide a password"
+                }
             },
         }
     }, {sequelize})
@@ -47,9 +43,10 @@ module.exports = (sequelize) => {
     //One to many correlation to courses
     User.associate = (models) => {
         User.hasMany(models.Course, {
+            as: 'user',
             foreignKey: {
                 fieldName: 'userId',
-                allowNull: true
+                allowNull: false
             }
         })
     }

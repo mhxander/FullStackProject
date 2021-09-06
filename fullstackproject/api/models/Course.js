@@ -10,13 +10,26 @@ module.exports = (sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
+        userId: {
+            type: Sequelize.INTEGER
+        },
         title: {
             type: Sequelize.STRING,
-            allowNull: false
+            VALIDATE: {
+                notEmpty: {
+                    msg: "Please provide a Title"
+                },
+                allowNull: false
+            }
         },
         description: {
             type: Sequelize.TEXT,
-            allowNull: false
+            validate: {
+                notEmpty: {
+                    msg: "Please provide a description"
+                },
+                allowNull: false
+            }
         }, 
         estimatedTime: {
             type: Sequelize.STRING,
@@ -31,7 +44,8 @@ module.exports = (sequelize) => {
     //one to one with "userId"
     Course.associate = (models) => {
         Course.belongsTo(models.User, {
-            foreignKey: {fieldName: 'userId'}
+            as: 'user',
+            foreignKey: {fieldName: 'userId', allowNull: false}
         })
     }
     return Course;
